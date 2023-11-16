@@ -21,6 +21,7 @@
 
 <script>
 import html2pdf from 'html2pdf.js';
+import XLSX from 'xlsx';
 
 export default {
   data() {
