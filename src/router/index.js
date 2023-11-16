@@ -16,6 +16,7 @@ import DetailAbsensiView from '../components/DetailAbsensiView.vue';
 import PemulihanViewVue from '@/components/PemulihanView.vue';
 import ErorView from '../components/ErorView.vue';
 import HomeViewVue from '@/components/user/HomeView.vue';
+import ScanQrCodeVue from '@/components/ScanQrCode.vue';
 
 const routes = [
   {
@@ -29,14 +30,19 @@ const routes = [
     component: ErorView,
   },
   {
-    path: '/dashboard/',
+    path: '/dashboard',
     name: 'Main',
     component: MainView,
     children: [
       {
-        path: '',
+        path: '/',
         name: 'Dashboard',
         component: DashboardView,
+      },
+      {
+        path: '/scan_qrQode',
+        name: 'Scan_qrQode',
+        component: ScanQrCodeVue,
       },
       {
         path: '/karyawan',

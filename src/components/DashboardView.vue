@@ -54,7 +54,6 @@ export default {
         });
 
         this.dataPersentase = response.data.data;
-        console.log(this.dataPersentase);
         this.$nextTick(() => {
           this.createChartPersentasePertahun();
         });
@@ -123,9 +122,8 @@ export default {
 
     async persentaseHariIni() {
       try {
-        const response = await axios.get(`https://tired-erin-pantsuit.cyclic.cloud/persentase_hari_ini`);
+        const response = await axios.get(`${API_KEY}persentase_hari_ini`);
         this.statusPresensiHariIni = response.data.data;
-        console.log(this.statusPresensiHariIni);
         this.createChartPersentaseHariIni();
       } catch (error) {
         // router.push({ name: 'Eror', params: { msg: error } });
@@ -138,6 +136,7 @@ export default {
       const totalHadir = this.statusPresensiHariIni.hadir;
       const totalTidak = this.statusPresensiHariIni.tidak;
       const totalSemua = totalHadir + totalTidak;
+
       // Menghitung persentase hadir dan tidak hadir
       const persentaseHadir = (totalHadir / totalSemua) * 100;
       const persentaseTidak = (totalTidak / totalSemua) * 100;

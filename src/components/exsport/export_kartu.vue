@@ -11,47 +11,8 @@
         </div>
         <div class="modal-body" ref="contentToExport">
           <div class="text-center p-4">
-            <h3 class="bold text-danger">Laporan Abseinsi Karyawan STG</h3>
-            <h6 class="fst-italic">Bulan {{ bulan }} , Tahun {{ tahun }}</h6>
+            <h3 class="bold text-danger">Cetak Kartu</h3>
           </div>
-          <table class="table table-sm tabel-pdf" style="font-size: 11px">
-            <thead>
-              <tr class="my-4 border-top border-secondary">
-                <th scope="col" class="text-center align-middle border-secondary border-start border-end" style="background-color: #8c92ff" rowspan="2">NO</th>
-                <th scope="col" class="text-center align-middle border-secondary border-end" style="background-color: #8c92ff" rowspan="2">NIK</th>
-                <th scope="col" class="text-center align-middle border-secondary border-end" style="background-color: #8c92ff" rowspan="2">Nama</th>
-                <th scope="col" class="text-center align-middle border-secondary border-end" style="background-color: #8c92ff" :colspan="dates.length">Tanggal</th>
-                <th scope="col" class="text-center align-middle border-secondary border-end" style="background-color: #ffd760" colspan="2">Jumlah</th>
-              </tr>
-              <tr class="my-4">
-                <th class="text-center align-middle border-secondary border-end" style="background-color: #d2d2d2" v-for="date in dates" :key="date">{{ formatDate(date) }}</th>
-                <th class="border-secondary border-end text-center align-middle" style="background-color: #ffd760">Y</th>
-                <th class="border-secondary border-end text-center align-middle" style="background-color: #ffd760">T</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-secondary border-bottom" v-for="(item, index) in laporan_absensi" :key="item.id">
-                <td class="align-middle text-center border-secondary border-end border-start">
-                  {{ index + 1 }}
-                </td>
-                <td class="align-middle border-secondary border-end">
-                  {{ item.no_nik }}
-                </td>
-                <td class="align-middle border-secondary border-end">
-                  {{ item.nama }}
-                </td>
-                <td class="align-middle border-secondary border-end text-center" v-for="date in dates" :key="date" :style="{ 'background-color': getBackgroundColor(item, date) }">
-                  {{ getStatus(item, date) }}
-                </td>
-                <td class="align-middle border-secondary border-end text-center" style="background-color: #ffd760">
-                  {{ item.Hadir }}
-                </td>
-                <td class="align-middle border-secondary border-end text-center" style="background-color: #ffd760">
-                  {{ item.Tidak }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
@@ -60,7 +21,6 @@
 
 <script>
 import html2pdf from 'html2pdf.js';
-import * as XLSX from 'xlsx';
 
 export default {
   data() {

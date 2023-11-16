@@ -102,6 +102,7 @@ export default {
         })
         .catch((error) => {
           router.push({ name: 'Eror', params: { msg: error } });
+          
         });
     },
 

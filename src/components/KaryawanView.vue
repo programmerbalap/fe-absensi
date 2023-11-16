@@ -154,7 +154,6 @@ export default {
         })
         .then((response) => {
           this.dataKaryawan = response.data.data;
-          console.log(this.dataKaryawan);
         })
         .catch((error) => {
           // router.push({ name: 'Eror', params: { msg: error } });

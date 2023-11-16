@@ -4,7 +4,7 @@
       <div class="card text-center">
         <h4 class="card-header">Selamat Datang!</h4>
         <div class="card-body p-4">
-          <img src="@/assets/img/profile-img.jpg" alt="Profile" class="rounded-circle" />
+          <img src="../../../public/assets/img/profil.jpg" style="max-width: 150px; max-height: 150px" alt="Profile" class="rounded-circle" />
           <h5 class="card-title">{{ dataMeKaryawan.nama }}</h5>
           <h5 style="margin-top: -23px">{{ jabatan }}</h5>
 
@@ -26,7 +26,8 @@
 
 <script>
 import axios from 'axios';
-// import router from '@/router';
+import { API_KEY } from '../../../env';
+import router from '@/router';
 
 export default {
   data() {
@@ -55,19 +56,18 @@ export default {
 
     async generateQr() {
       try {
-        const response = await axios.get(`generateQrCode`);
+        const response = await axios.get(`${API_KEY}generateQrCode`);
         this.statusPresensiHariIni = response.data.data;
         this.createChartPersentaseHariIni();
       } catch (error) {
-        // router.push({ name: 'Eror', params: { msg: error } });
-        console.log(error.response);
+        router.push({ name: 'Eror', params: { msg: error } });
       }
     },
 
     async getMe() {
       const token = localStorage.getItem('accessToken');
       await axios
-        .get(`me`, {
+        .get(`${API_KEY}me`, {
           headers: {
             'x-access-token': token,
           },
@@ -81,8 +81,7 @@ export default {
           this.kecamatan = response.data.karyawan.kecamatan.nama;
         })
         .catch((error) => {
-          // router.push({ name: 'Eror', params: { msg: error } });
-          console.log(error.response);
+          router.push({ name: 'Eror', params: { msg: error } });
         });
     },
   },

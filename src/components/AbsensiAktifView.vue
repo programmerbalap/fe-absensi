@@ -70,6 +70,8 @@ import axios from 'axios';
 import PageTitle from './conponent/PageTitle.vue';
 // import router from '@/router';
 import SweetAlertHelper from '@/SweetAlertHelper/SweetAlertHelper';
+import { API_KEY } from '../../env';
+import router from '@/router';
 
 export default {
   inject: ['accessToken'],
@@ -106,7 +108,7 @@ export default {
     stayAbsensi() {
       const token = localStorage.getItem('accessToken');
       axios
-        .get(`https://tired-erin-pantsuit.cyclic.cloud/ready_present/${true}`, {
+        .get(`${API_KEY}ready_present/${true}`, {
           params: {
             shift: this.getShiftStatus(),
           },
@@ -124,7 +126,7 @@ export default {
     },
 
     getUrl(item) {
-      return `https://tired-erin-pantsuit.cyclic.cloud/${item}`;
+      return `${API_KEY}${item}`;
     },
 
     start(id, status) {
@@ -133,23 +135,22 @@ export default {
         hadir: status,
         shift: this.getShiftStatus(),
       };
-      // Lakukan permintaan POST menggunakan Axios
       axios
-        .post(`https://tired-erin-pantsuit.cyclic.cloud/start_presensi`, data)
+        .post(`${API_KEY}start_presensi`, data)
         .then((response) => {
           this.msg = response.data.msg;
           alert(this.msg);
           this.stayAbsensi();
         })
         .catch((error) => {
-          // router.push({ name: 'Eror', params: { msg: error } });
-          console.log(error.response);
+          router.push({ name: 'Eror', params: { msg: error } });
+          // console.log(error.response);
         });
     },
 
     stop(id) {
       axios
-        .patch(`https://tired-erin-pantsuit.cyclic.cloud/end_presensi/${id}`)
+        .patch(`${API_KEY}end_presensi/${id}`)
         .then((response) => {
           SweetAlertHelper.success('Berhasil!', response.data.msg);
           this.stayAbsensi();
@@ -164,7 +165,7 @@ export default {
       SweetAlertHelper.confirm('Apakah yakin mengakhiri?', 'Jika sudah yakin klik oke!').then((result) => {
         if (result.isConfirmed) {
           axios
-            .patch(`https://tired-erin-pantsuit.cyclic.cloud/selesai`)
+            .patch(`${API_KEY}selesai`)
             .then((response) => {
               if (response.status === 200) {
                 SweetAlertHelper.success('Berhasil!', response.data.msg);

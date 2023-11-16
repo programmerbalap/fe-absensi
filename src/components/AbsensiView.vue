@@ -84,6 +84,7 @@
 import axios from 'axios';
 import PageTitle from './conponent/PageTitle.vue';
 import SweetAlertHelper from '@/SweetAlertHelper/SweetAlertHelper';
+import { API_KEY } from '../../env';
 
 export default {
   components: {
@@ -105,6 +106,7 @@ export default {
       bonusAll: false,
       hiddenAktif: [],
       currentTime: '',
+      dataSingelStatus: '',
     };
   },
   methods: {
@@ -120,7 +122,7 @@ export default {
 
     getJamEfektif() {
       axios
-        .get(`https://tired-erin-pantsuit.cyclic.cloud/jam_kerja/1`)
+        .get(`${API_KEY}jam_kerja/1`)
         .then((response) => {
           this.jamEfektif = response.data.data;
         })
@@ -133,7 +135,7 @@ export default {
     getAbsen() {
       const token = localStorage.getItem('accessToken');
       axios
-        .get(`https://tired-erin-pantsuit.cyclic.cloud/prepare_present`, {
+        .get(`${API_KEY}prepare_present`, {
           headers: {
             'x-access-token': token,
           },
@@ -149,12 +151,12 @@ export default {
     },
 
     getUrl(item) {
-      return `https://tired-erin-pantsuit.cyclic.cloud/${item}`;
+      return `${API_KEY}${item}`;
     },
 
     getHiddenAktif() {
       axios
-        .get(`https://tired-erin-pantsuit.cyclic.cloud/aktif`)
+        .get(`${API_KEY}aktif`)
         .then((response) => {
           this.hiddenAktif = response.data.data;
         })
@@ -171,7 +173,7 @@ export default {
         SweetAlertHelper.confirm('Yakin mulai semua?', 'Silahkan klik YES jika yakin!').then((result) => {
           if (result.isConfirmed) {
             axios
-              .post(`https://tired-erin-pantsuit.cyclic.cloud/start_all_presensi`, {
+              .post(`${API_KEY}start_all_presensi`, {
                 bonusAll: bonus,
                 shift: shift,
               })
@@ -188,7 +190,27 @@ export default {
       }
     },
 
-    start(id, hadir, bonus, shift) {
+    cekAktifAbsensi(id_karyawan, shift_id, hadir) {
+      return axios
+        .get(`${API_KEY}cek_aktif`, {
+          params: {
+            id_karyawan: id_karyawan,
+            shift_id: shift_id,
+            hadir: hadir,
+          },
+        })
+        .then((response) => {
+          return response.status;
+        })
+        .catch((error) => {
+          // router.push({ name: 'Eror', params: { msg: error } });
+          console.log(error.response);
+        });
+    },
+
+    async start(id, hadir, bonus, shift) {
+      const status = await this.cekAktifAbsensi(id, shift, hadir);
+
       const data = {
         id_karyawan: id,
         hadir: hadir,
@@ -196,16 +218,43 @@ export default {
         shift: shift,
       };
 
-      axios
-        .post(`https://tired-erin-pantsuit.cyclic.cloud/start_presensi`, data)
-        .then((response) => {
-          SweetAlertHelper.success('Berhasil!', response.data.msg);
-          this.getAbsen();
-        })
-        .catch((error) => {
-          // router.push({ name: 'Eror', params: { msg: error } });
-          console.log(error.response);
+      if (status == 200) {
+        await axios
+          .post(`${API_KEY}start_presensi`, data)
+          .then((response) => {
+            SweetAlertHelper.success('Berhasil!', response.data.msg);
+            this.getAbsen();
+          })
+          .catch((error) => {
+            console.log(error.response);
+          });
+      } else if (status == 202) {
+        SweetAlertHelper.confirm('Crash Absensi!', 'Apakah direset ualang?').then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              // Pertama, jalankan permintaan delete
+              const deleteResponse = await axios.delete(`${API_KEY}reset`, {
+                params: {
+                  id_karyawan: id,
+                  shift_id: shift,
+                  hadir: hadir,
+                },
+              });
+
+              if (deleteResponse.status === 200) {
+                SweetAlertHelper.success('Berhasil!', 'Absensi direset ulang.');
+              }
+
+              // Kemudian, jalankan permintaan post setelah permintaan delete selesai
+              const postResponse = await axios.post(`${API_KEY}start_presensi`, data);
+              SweetAlertHelper.success('Berhasil!', postResponse.data.msg);
+              this.getAbsen();
+            } catch (error) {
+              console.log(error.response);
+            }
+          }
         });
+      }
     },
 
     toggleBonus(karyawanId) {

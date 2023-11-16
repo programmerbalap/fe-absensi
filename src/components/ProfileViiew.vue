@@ -35,6 +35,9 @@
                 <li class="nav-item">
                   <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Ganti Password</button>
                 </li>
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#kartu-qr-code">Kartu</button>
+                </li>
               </ul>
               <div class="tab-content pt-2">
                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
@@ -145,6 +148,32 @@
                   </form>
                   <!-- End Change Password Form -->
                 </div>
+
+                <div class="tab-pane fade" id="kartu-qr-code">
+                  <div class="card mx-auto my-2" style="max-width: 400px; max-height: 900px">
+                    <div class="card-header">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <p>Kartu Karyawan</p>
+                        <p>
+                          <a href="#">
+                            <i @click="saveImage()" typeof="button" class="bi bi-download"></i>
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="custom-card" ref="contentToExport">
+                      <br /><br /><br />
+                      <div class="card-body text-center mb-0">
+                        <h5 class="text-primary fw-bold mt-3 py-4">Sinar Tanjung Group</h5>
+                        <img src="../../public/assets/img/profil.jpg" style="max-width: 150px; max-height: 150px" alt="Profile" class="rounded-circle" />
+                        <h4 class="text-primary mt-4">{{ dataMeKaryawan.nama }}</h4>
+                        <h6 style="margin-top: -5px">~ NIK. {{ dataMeKaryawan.no_nik }} ~</h6>
+                        <h6 style="margin-top: -5px">~ {{ jabatan }} ~</h6>
+                        <img class="m-3" width="250" height="250" :src="dataMeKaryawan.code_qr" alt="code_qr" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <!-- End Bordered Tabs -->
             </div>
@@ -155,12 +184,22 @@
   </main>
 </template>
 
+<style>
+.custom-card {
+  background-image: url('../../public/assets/img/kartu.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  margin-top: -15px;
+}
+</style>
+
 <script>
 import axios from 'axios';
 import PageTitle from './conponent/PageTitle.vue';
 import SweetAlertHelper from '@/SweetAlertHelper/SweetAlertHelper';
 import router from '@/router';
 import { API_KEY } from '../../env';
+import html2pdf from 'html2pdf.js';
 
 export default {
   components: {
@@ -217,6 +256,22 @@ export default {
             router.push({ name: 'Eror', params: { msg: error } });
           }
         }
+      }
+    },
+
+    saveImage() {
+      try {
+        const contentToExport = this.$refs.contentToExport;
+        const pdfOptions = {
+          margin: 10,
+          filename: 'exported-content.pdf',
+          image: { type: 'pdf', quality: 1 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: [140, 215] },
+        };
+        html2pdf().from(contentToExport).set(pdfOptions).save();
+      } catch (err) {
+        console.log(err);
       }
     },
   },
